@@ -40,7 +40,7 @@ app.post('/enviar', (req, res) => {
             to: 'augustomarcos026@gmail.com',
             subject: 'Checklist de Aptidão - PDF',
             text: `Segue checklist de ${nome}`,
-            attachments: [{ filename: 'checklist.pdf', path: filePath }]
+         attachments: [{ filename: path.basename(filePath), path: filePath }]
         };
 
         transporter.sendMail(mailOptions, (error, info) => {

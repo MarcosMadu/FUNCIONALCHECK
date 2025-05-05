@@ -1,46 +1,201 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Checklist de Aptidão Diária</title>
-    <style>
-        body { font-family: Arial; background: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        form { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        select, button { width: 100%; margin-top: 10px; padding: 8px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Checklist de Aptidão Diária</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+      background-color: #f5f5f5;
+      margin: 0;
+    }
+    .form-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: auto;
+    }
+    label, input, select {
+      display: block;
+      margin: 15px auto;
+      width: 90%;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .card {
+      margin: 0;
+      padding: 40px;
+      font-size: 28px;
+      font-weight: bold;
+      border-radius: 10px;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .card small {
+      font-weight: normal;
+      font-size: 18px;
+      margin-top: 15px;
+    }
+    #btn-voltar {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #fff;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 999;
+      display: none;
+    }
+    .apto {
+      background-color: #28a745;
+    }
+    .inapto {
+      background-color: #dc3545;
+    }
+  </style>
 </head>
 <body>
-    <form method="POST" action="/enviar">
-        <h2>Checklist de Aptidão Diária</h2>
-        <label>Nome do Colaborador:
-            <select name="nome">
-                <option value="">Selecione</option>
-                <option>João</option>
-                <option>Maria</option>
-                <option>Pedro</option>
-            </select>
-        </label>
-        <label>Você está se sentindo bem?
-            <select name="sentindo_bem">
-                <option>Sim</option><option>Não</option>
-            </select>
-        </label>
-        <label>Você ingeriu bebida alcoólica na noite anterior?
-            <select name="bebida">
-                <option>Sim</option><option>Não</option>
-            </select>
-        </label>
-        <label>Você está com sinais de sonolência?
-            <select name="sono">
-                <option>Sim</option><option>Não</option>
-            </select>
-        </label>
-        <label>Você se sente bem para trabalhar hoje?
-            <select name="apto">
-                <option>Sim</option><option>Não</option>
-            </select>
-        </label>
-        <button type="submit">Verificar</button>
+
+  <div class="form-container">
+    <h2>Checklist de Aptidão Diária</h2>
+    <form id="formulario">
+      <label for="nome">Nome do Colaborador:</label>
+      <input type="text" id="nome" required>
+
+      <label for="bem">Você está se sentindo bem?</label>
+      <select id="bem" required>
+        <option value="">Selecione</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+      </select>
+
+      <label for="alcool">Você ingeriu bebida alcoólica na noite anterior?</label>
+      <select id="alcool" required>
+        <option value="">Selecione</option>
+        <option value="nao">Não</option>
+        <option value="sim">Sim</option>
+      </select>
+
+      <label for="sono">Você está com sinais de sonolência?</label>
+      <select id="sono" required>
+        <option value="">Selecione</option>
+        <option value="nao">Não</option>
+        <option value="sim">Sim</option>
+      </select>
+
+      <label for="trabalhar">Você se sente bem para trabalhar hoje?</label>
+      <select id="trabalhar" required>
+        <option value="">Selecione</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+      </select>
+
+      <button type="submit">Verificar</button>
     </form>
+  </div>
+
+  <div id="resultado"></div>
+  <button id="btn-voltar" onclick="voltarFormulario()">⬅ Voltar ao Formulário</button>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const formulario = document.getElementById("formulario");
+      const resultadoDiv = document.getElementById("resultado");
+      const formContainer = document.querySelector(".form-container");
+      const btnVoltar = document.getElementById("btn-voltar");
+
+      formulario.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const nome = document.getElementById("nome").value;
+        const bem = document.getElementById("bem").value;
+        const alcool = document.getElementById("alcool").value;
+        const sono = document.getElementById("sono").value;
+        const trabalhar = document.getElementById("trabalhar").value;
+
+        const agora = new Date();
+        const dataHora = agora.toLocaleString("pt-BR");
+
+        let mensagem, classe;
+        if (bem === "sim" && alcool === "nao" && sono === "nao" && trabalhar === "sim") {
+          mensagem = `<strong>${nome}</strong> está APTO para trabalhar hoje.`;
+          classe = "apto";
+        } else {
+          mensagem = `<strong>${nome}</strong> está INAPTO para trabalhar hoje.`;
+          classe = "inapto";
+        }
+
+        formContainer.style.display = "none";
+
+        resultadoDiv.innerHTML = `
+          <div class="card ${classe}">
+            ${mensagem}<br>
+            <small>Preenchido em: ${dataHora}</small><br><br>
+            <button onclick="enviarFormulario()">Enviar</button>
+          </div>
+        `;
+
+        btnVoltar.style.display = "block";
+      });
+    });
+
+    function voltarFormulario() {
+      document.querySelector(".form-container").style.display = "block";
+      document.getElementById("resultado").innerHTML = "";
+      document.getElementById("formulario").reset();
+      document.getElementById("btn-voltar").style.display = "none";
+    }
+
+    function enviarFormulario() {
+      const nome = document.getElementById("nome").value;
+      const bem = document.getElementById("bem").value;
+      const alcool = document.getElementById("alcool").value;
+      const sono = document.getElementById("sono").value;
+      const trabalhar = document.getElementById("trabalhar").value;
+
+      fetch("/enviar", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          nome: nome,
+          sentindo_bem: bem,
+          bebida: alcool,
+          sono: sono,
+          apto: trabalhar
+        })
+      })
+      .then(res => res.text())
+      .then(msg => alert(msg))
+      .catch(err => alert("Erro ao enviar: " + err));
+    }
+  </script>
+
 </body>
 </html>
